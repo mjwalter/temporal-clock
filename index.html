@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Sun Clock</title>
+    <!-- <link rel="stylesheet" href="style.css"> -->
+  </head>
+  <body>
+    <div id="sunrise-sunset"></div>
+    <script>
+      // Function to get sunrise/sunset data from API
+      const fetchSunriseSunset = async (lat="38.907192", lng="-77.036873") => {
+        const results = await fetch(`https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lng}&formatted=0`);
+        const data = await results.json();
+        return data.results;
+      }
+      // Function to calculate temporal hour length
+      const calculateTemporalHourLength = (sunrise, sunset) => {
+        const sunriseDate = new Date(sunrise);
+        const sunsetDate = new Date(sunset);
+        const temporalHourLength = (sunsetDate - sunriseDate) / 12;
+        return temporalHourLength / (60 * 60 * 1000);
+      }
+      // Function to calculate current temporal time
+      const calculateCurrentTemporalTime = (sunrise, sunset) => {
+        const sunriseDate = new Date(sunrise);
+        const sunsetDate = new Date(sunset);
+        const currentDate = new Date();
+        const temporalHourLength = (sunsetDate - sunriseDate) / 12;
+        // Make sure the hours are positive, between 0 and 24
+        const temporalTime = (currentDate - sunriseDate) / temporalHourLength;
+        return temporalTime < 0 ? temporalTime + 24 : temporalTime;
+      }
+      const formatTemporalTime = (temporalTime) => {
+        const hoursSinceDawn = Math.floor(temporalTime);
+        const hours = hoursSinceDawn < 18 ? hoursSinceDawn + 6 : hoursSinceDawn - 18;
+        const minutes = Math.floor((temporalTime - hoursSinceDawn) * 60);
+        const paddedHours = hours.toString().padStart(2, '0');
+        const paddedMinutes = minutes.toString().padStart(2, '0');
+        return `${paddedHours}:${paddedMinutes}`;
+      }
+      const tradTemporalTime = (temporalTime) => {
+        const hoursSinceDawn = Math.floor(temporalTime);
+        // Turn hour 0 into "First hour", 1 into "Second hour", etc.
+        const hourNames = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eighth", "Ninth", "Tenth", "Eleventh", "Twelfth"];
+        // There are four watches of the night, each three hours long
+        const watchNames = ["First", "First", "First", "Second", "Second", "Second", "Third", "Third", "Third", "Fourth", "Fourth", "Fourth"];
+        return hoursSinceDawn < 13 ? `${hourNames[hoursSinceDawn]} hour` : `${watchNames[hoursSinceDawn - 12]} watch`;
+      }
+      document.addEventListener('DOMContentLoaded', async (event) => {
+        const data = await fetchSunriseSunset();
+        const updateSunriseSunset = () => {
+          document.getElementById('sunrise-sunset').innerHTML = `
+            <p><strong>${tradTemporalTime(calculateCurrentTemporalTime(data.sunrise, data.sunset))}</strong></p>
+            <p>${formatTemporalTime(calculateCurrentTemporalTime(data.sunrise, data.sunset))}</p>
+          `;
+        };
+        updateSunriseSunset();
+        setInterval(updateSunriseSunset, 1000);
+      });
+    </script>
+  </body>
+</html>
