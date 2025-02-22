@@ -47,7 +47,7 @@
         const hourNames = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eighth", "Ninth", "Tenth", "Eleventh", "Twelfth"];
         // There are four watches of the night, each three hours long
         const watchNames = ["First", "First", "First", "Second", "Second", "Second", "Third", "Third", "Third", "Fourth", "Fourth", "Fourth"];
-        return hoursSinceDawn < 13 ? `${hourNames[hoursSinceDawn]} hour` : `${watchNames[hoursSinceDawn - 12]} watch`;
+        return hoursSinceDawn < 12 ? `${hourNames[hoursSinceDawn]} hour` : `${watchNames[hoursSinceDawn - 12]} watch`;
       }
       document.addEventListener('DOMContentLoaded', async (event) => {
         const data = await fetchSunriseSunset();
