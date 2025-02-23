@@ -10,9 +10,9 @@
   <body>
     <div id="coordinates">
       <label for="latitude">Latitude:</label>
-      <input type="text" id="latitude" value="38.907192">
+      <input type="text" id="latitude" value="42.3251">
       <label for="longitude">Longitude:</label>
-      <input type="text" id="longitude" value="-77.036873">
+      <input type="text" id="longitude" value="-72.6412">
     </div>
     <p>
       <button id="update-coordinates">Start</button>
@@ -21,7 +21,7 @@
     <script>
       let dataFromApi = null;
       // Function to get sunrise/sunset data from API
-      const fetchSunriseSunset = async (lat="42.3251", lng="-72.6412") => {
+      const fetchSunriseSunset = async (lat, lng) => {
         const results = await fetch(`https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lng}&formatted=0`);
         const data = await results.json();
         return data.results;
