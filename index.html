@@ -21,7 +21,7 @@
     <script>
       let dataFromApi = null;
       // Function to get sunrise/sunset data from API
-      const fetchSunriseSunset = async (lat="38.907192", lng="-77.036873") => {
+      const fetchSunriseSunset = async (lat="42.3251", lng="-72.6412") => {
         const results = await fetch(`https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lng}&formatted=0`);
         const data = await results.json();
         return data.results;
