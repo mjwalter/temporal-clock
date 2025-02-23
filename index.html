@@ -8,8 +8,18 @@
     <!-- <link rel="stylesheet" href="style.css"> -->
   </head>
   <body>
+    <div id="coordinates">
+      <label for="latitude">Latitude:</label>
+      <input type="text" id="latitude" value="38.907192">
+      <label for="longitude">Longitude:</label>
+      <input type="text" id="longitude" value="-77.036873">
+    </div>
+    <p>
+      <button id="update-coordinates">Start</button>
+    </p>
     <div id="sunrise-sunset"></div>
     <script>
+      let dataFromApi = null;
       // Function to get sunrise/sunset data from API
       const fetchSunriseSunset = async (lat="38.907192", lng="-77.036873") => {
         const results = await fetch(`https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lng}&formatted=0`);
@@ -50,15 +60,22 @@
         return hoursSinceDawn < 12 ? `${hourNames[hoursSinceDawn]} hour` : `${watchNames[hoursSinceDawn - 12]} watch`;
       }
       document.addEventListener('DOMContentLoaded', async (event) => {
-        const data = await fetchSunriseSunset();
-        const updateSunriseSunset = () => {
+        const updateSunriseSunset = (data) => {
           document.getElementById('sunrise-sunset').innerHTML = `
             <p><strong>${tradTemporalTime(calculateCurrentTemporalTime(data.sunrise, data.sunset))}</strong></p>
             <p>${formatTemporalTime(calculateCurrentTemporalTime(data.sunrise, data.sunset))}</p>
           `;
         };
-        updateSunriseSunset();
-        setInterval(updateSunriseSunset, 1000);
+
+        // Update coordinates when the button is clicked
+        document.getElementById('update-coordinates').addEventListener('click', async (event) => {
+          let latitude = document.getElementById('latitude').value;
+          let longitude = document.getElementById('longitude').value;
+          dataFromApi = await fetchSunriseSunset(latitude, longitude);
+          updateSunriseSunset(dataFromApi);
+        });
+
+        setInterval(() => updateSunriseSunset(dataFromApi), 1000);
       });
     </script>
   </body>
