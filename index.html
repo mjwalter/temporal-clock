@@ -26,22 +26,24 @@
         const data = await results.json();
         return data.results;
       }
-      // Function to calculate temporal hour length
-      const calculateTemporalHourLength = (sunrise, sunset) => {
-        const sunriseDate = new Date(sunrise);
-        const sunsetDate = new Date(sunset);
-        const temporalHourLength = (sunsetDate - sunriseDate) / 12;
-        return temporalHourLength / (60 * 60 * 1000);
-      }
       // Function to calculate current temporal time
       const calculateCurrentTemporalTime = (sunrise, sunset) => {
         const sunriseDate = new Date(sunrise);
         const sunsetDate = new Date(sunset);
         const currentDate = new Date();
-        const temporalHourLength = (sunsetDate - sunriseDate) / 12;
-        // Make sure the hours are positive, between 0 and 24
-        const temporalTime = (currentDate - sunriseDate) / temporalHourLength;
-        return temporalTime < 0 ? temporalTime + 24 : temporalTime;
+        const tomorrowSunriseDate = new Date(sunriseDate.getTime() + 24 * 60 * 60 * 1000);
+        const temporalDayHourLength = (sunsetDate - sunriseDate) / 12;
+        const temporalNightHourLength = (tomorrowSunriseDate - sunsetDate) / 12;
+
+        const adjCurrentDate = currentDate >= sunriseDate ? currentDate : new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
+        // During the day
+        if (adjCurrentDate < sunsetDate) {
+          return (adjCurrentDate - sunriseDate) / temporalDayHourLength;
+        }
+        // At night
+        else {
+          return ((adjCurrentDate - sunsetDate) / temporalNightHourLength) + 12;
+        }
       }
       const formatTemporalTime = (temporalTime) => {
         const hoursSinceDawn = Math.floor(temporalTime);
@@ -61,10 +63,12 @@
       }
       document.addEventListener('DOMContentLoaded', async (event) => {
         const updateSunriseSunset = (data) => {
-          document.getElementById('sunrise-sunset').innerHTML = `
-            <p><strong>${tradTemporalTime(calculateCurrentTemporalTime(data.sunrise, data.sunset))}</strong></p>
-            <p>${formatTemporalTime(calculateCurrentTemporalTime(data.sunrise, data.sunset))}</p>
-          `;
+          if (data) {
+            document.getElementById('sunrise-sunset').innerHTML = `
+              <p><strong>${tradTemporalTime(calculateCurrentTemporalTime(data.sunrise, data.sunset))}</strong></p>
+              <p>${formatTemporalTime(calculateCurrentTemporalTime(data.sunrise, data.sunset))}</p>
+            `;
+          }
         };
 
         // Update coordinates when the button is clicked
