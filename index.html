@@ -64,10 +64,17 @@
       document.addEventListener('DOMContentLoaded', async (event) => {
         const updateSunriseSunset = (data) => {
           if (data) {
-            document.getElementById('sunrise-sunset').innerHTML = `
-              <p><strong>${tradTemporalTime(calculateCurrentTemporalTime(data.sunrise, data.sunset))}</strong></p>
-              <p>${formatTemporalTime(calculateCurrentTemporalTime(data.sunrise, data.sunset))}</p>
-            `;
+            // If the watch is undefined, more than a day has passed since
+            // the app was loaded, so clear the display
+            if (!tradTemporalTime(calculateCurrentTemporalTime(data.sunrise, data.sunset))) {
+              document.getElementById('sunrise-sunset').innerHTML = '';
+            }
+            else {
+              document.getElementById('sunrise-sunset').innerHTML = `
+                <p><strong>${tradTemporalTime(calculateCurrentTemporalTime(data.sunrise, data.sunset))}</strong></p>
+                <p>${formatTemporalTime(calculateCurrentTemporalTime(data.sunrise, data.sunset))}</p>
+              `;
+            }
           }
         };
 
