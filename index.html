@@ -6,13 +6,48 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Sun Clock</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <style>
+      body {
+        padding: 10px;
+      }
+      p {
+        margin: 0;
+      }
+      div#coordinates {
+        display: flex;
+      }
+      div#coordinates p {
+        line-height: 1.8;
+        margin-right: 10px;
+        margin-bottom: 5px;
+        width: 9em;
+      }
+      input {
+        width: 90%;
+      }
+      div#sunrise-sunset {
+        margin-top: 40px;
+      }
+      p.trad-time {
+        font-size: 200%;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+      p.clock {
+        font-size: 300%;
+      }
+    </style>
   </head>
   <body>
     <div id="coordinates">
-      <label for="latitude">Latitude:</label>
-      <input type="text" id="latitude" value="42.3251">
-      <label for="longitude">Longitude:</label>
-      <input type="text" id="longitude" value="-72.6412">
+      <p>
+        <label for="latitude">Latitude:</label>
+        <input type="text" id="latitude" value="42.3251">
+      </p>
+      <p>
+        <label for="longitude">Longitude:</label>
+        <input type="text" id="longitude" value="-72.6412">
+      </p>
     </div>
     <p>
       <button id="update-coordinates">Start</button>
@@ -61,33 +96,34 @@
         const watchNames = ["First", "First", "First", "Second", "Second", "Second", "Third", "Third", "Third", "Fourth", "Fourth", "Fourth"];
         return hoursSinceDawn < 12 ? `${hourNames[hoursSinceDawn]} hour` : `${watchNames[hoursSinceDawn - 12]} watch`;
       }
-      document.addEventListener('DOMContentLoaded', async (event) => {
-        const updateSunriseSunset = (data) => {
-          if (data) {
-            // If the watch is undefined, more than a day has passed since
-            // the app was loaded, so clear the display
+
+      // document.addEventListener('DOMContentLoaded', async (event) => {
+      // });
+
+      const refreshSunriseSunset = (data) => {
+        if (data) {
+          // If the watch is undefined, more than a day has passed since
+          // the app was loaded, so clear the display
           if (calculateCurrentTemporalTime(data.sunrise, data.sunset) >= 24) {
-              document.getElementById('sunrise-sunset').innerHTML = '';
-            }
-            else {
-              document.getElementById('sunrise-sunset').innerHTML = `
-                <p><strong>${tradTemporalTime(calculateCurrentTemporalTime(data.sunrise, data.sunset))}</strong></p>
-                <p>${formatTemporalTime(calculateCurrentTemporalTime(data.sunrise, data.sunset))}</p>
-              `;
-            }
+            document.getElementById('sunrise-sunset').innerHTML = '';
           }
-        };
+          else {
+            document.getElementById('sunrise-sunset').innerHTML = `
+              <p class="trad-time">${tradTemporalTime(calculateCurrentTemporalTime(data.sunrise, data.sunset))}</strong></p>
+              <p class="clock">${formatTemporalTime(calculateCurrentTemporalTime(data.sunrise, data.sunset))}</p>
+            `;
+          }
+        }
+      };
 
-        // Update coordinates when the button is clicked
-        document.getElementById('update-coordinates').addEventListener('click', async (event) => {
-          let latitude = document.getElementById('latitude').value;
-          let longitude = document.getElementById('longitude').value;
-          dataFromApi = await fetchSunriseSunset(latitude, longitude);
-          updateSunriseSunset(dataFromApi);
-        });
-
-        setInterval(() => updateSunriseSunset(dataFromApi), 1000);
+      // Update coordinates when the button is clicked
+      document.getElementById('update-coordinates').addEventListener('click', async (event) => {
+        let latitude = document.getElementById('latitude').value;
+        let longitude = document.getElementById('longitude').value;
+        dataFromApi = await fetchSunriseSunset(latitude, longitude);
+        refreshSunriseSunset(dataFromApi);
       });
+      setInterval(() => refreshSunriseSunset(dataFromApi), 1000);
     </script>
   </body>
 </html>
