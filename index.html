@@ -66,7 +66,7 @@
           if (data) {
             // If the watch is undefined, more than a day has passed since
             // the app was loaded, so clear the display
-            if (tradTemporalTime(calculateCurrentTemporalTime(data.sunrise, data.sunset)) === undefined) {
+          if (calculateCurrentTemporalTime(data.sunrise, data.sunset) >= 24) {
               document.getElementById('sunrise-sunset').innerHTML = '';
             }
             else {
